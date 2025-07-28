@@ -25,8 +25,11 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from django.http import JsonResponse
 
 
+def health_check(request):
+    return JsonResponse({"message": "200"})
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -48,6 +51,7 @@ urlpatterns = [
 
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    path('health/', health_check, name='health')
 ]
 # POST /auth/users/ – Registration
 
