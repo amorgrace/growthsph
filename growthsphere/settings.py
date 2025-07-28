@@ -153,7 +153,7 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'growthsphere.wsgi.application'
+WSGI_APPLICATION = 'growthsphere.wsgi.application'
 
 
 # Database
