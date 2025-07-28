@@ -1,0 +1,15 @@
+{% block subject %}Activate your Growthsph account{% endblock %}
+
+{% block text_body %}
+Hello {{ user.get_full_name|default:user.email }},
+
+Thank you for signing up on {{ site_name }}.
+
+To activate your account, click the link below:
+{{ activation_url }}
+
+If you did not register, just ignore this email.
+
+Thanks,
+The {{ site_name }} Team
+{% endblock %}
