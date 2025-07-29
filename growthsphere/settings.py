@@ -76,7 +76,7 @@ MIDDLEWARE = [
 ]
 
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"  # Use SMTP in production
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 DJOSER = {
     "LOGIN_FIELD": "email",
