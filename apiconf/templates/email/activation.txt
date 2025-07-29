@@ -1,15 +1,34 @@
-{% block subject %}Activate your Growthsph account{% endblock %}
+{% block subject %}ACTION REQUIRED: Activate Your Growthsphere Account{% endblock %}
 
 {% block text_body %}
-Hello {{ user.get_full_name|default:user.email }},
+Dear {{ user.get_full_name|default:user.email }},
 
-Thank you for signing up on {{ site_name }}.
+Welcome to Growthsphere! We're excited to have you on board.
 
-To activate your account, click the link below:
+ACCOUNT ACTIVATION REQUIRED:
+To complete your registration and access your account, please activate it within the next 24 hours by clicking below:
+
 {{ activation_url }}
 
-If you did not register, just ignore this email.
+IMPORTANT DETAILS:
+- Activation link expires in 24 hours.
+- One-time use only.
+- Required for full platform access.
 
-Thanks,
-The {{ site_name }} Team
+SECURITY REMINDER:
+- Never share your activation link with anyone.
+- Our team will never ask for your password via email.
+
+Need help? Contact our support team at:
+Email: info@growthsphere.com
+Hours: Mon-Fri, 9AM-5PM EST
+
+Welcome aboard,
+The Growthsphere Support Team
+
+------------------------------------------
+Why you received this email:
+If you did not register this account, kindly ignore this email.
+Copyright © {% now "Y" %} Growthsphere. All rights reserved.
+------------------------------------------
 {% endblock %}
