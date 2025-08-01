@@ -121,3 +121,8 @@ class KYCSerializer(serializers.ModelSerializer):
         model = KYC
         fields = ['user', 'id_type', 'id_front_url', 'id_back_url', 'kyc_status']
         read_only_fields = ['user', 'kyc_status']
+
+class ChangePasswordSerializer(serializers.Serializer):
+    current_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    confirm_password = serializers.CharField(required=True)

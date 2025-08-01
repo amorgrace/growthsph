@@ -7,10 +7,11 @@ from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .serializers import WalletAddressSerializer, FinancesSerializers, RecentTransactionSerializer, KYCSerializer
+from .serializers import WalletAddressSerializer, FinancesSerializers, RecentTransactionSerializer, KYCSerializer, ChangePasswordSerializer
 from .models import WalletAddres, Finance, RecentTransaction, KYC
 from djoser.serializers import ActivationSerializer
 from djoser.utils import decode_uid
+from drf_yasg.utils import swagger_auto_schema
 
 
 class ActivateUserView(APIView):
@@ -98,14 +99,38 @@ class KYCUploadView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-from django.http import JsonResponse
-from django.core.mail import send_mail
+# from django.http import JsonResponse
+# from django.core.mail import send_mail
 
-def test_email_view(request):
-    send_mail(
-        "Test Subject",
-        "Test message",
-        "noreply@example.com",
-        ["youremail@example.com"],
-    )
-    return JsonResponse({"status": "sent"})
+# def test_email_view(request):
+#     send_mail(
+#         "Test Subject",
+#         "Test message",
+#         "noreply@example.com",
+#         ["youremail@example.com"],
+#     )
+#     return JsonResponse({"status": "sent"})
+
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(request_body=ChangePasswordSerializer)
+    def put(self, request):
+        serializer = ChangePasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = request.user
+        current_password = serializer.validated_data['current_password']
+        new_password = serializer.validated_data['new_password']
+        confirm_password = serializer.validated_data['confirm_password']
+
+        if not user.check_password(current_password):
+            return Response({'error': 'Current Password is Incorrect.'}, status=status.HTTP_400_BAD_REQUEST)
+        if new_password != confirm_password:
+            return Response({'error': 'Passwords do not match.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user.set_password(new_password)
+        user.save()
+
+        return Response({'detail': 'Password updated successfully.'}, status=status.HTTP_200_OK)

@@ -26,7 +26,7 @@ class CustomActivationEmail(ActivationEmail):
         # domain = context.get("domain")
         # protocol = context.get("protocol")
 
-        context["activation_url"] = f"http://localhost:5173/activate/{uid}/{token}/"
-        # context["activation_url"] = f"http://growthsph.com/activate/{uid}/{token}/" use in Production.
+        # context["activation_url"] = f"http://localhost:5173/activate/{uid}/{token}/"
+        context["activation_url"] = f"http://growthsph.com/activate/{uid}/{token}/"
 
         return context
