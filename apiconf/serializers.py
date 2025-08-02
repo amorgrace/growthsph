@@ -13,6 +13,7 @@ class CustomUserCreateSerializer(DjoserUserCreateSerializer):
         style={'input_type': 'password'},
         write_only=True
     )
+    id = serializers.CharField(source='public_id', read_only=True)
 
     class Meta(DjoserUserCreateSerializer.Meta):
         model = User
@@ -96,6 +97,7 @@ class FinancesSerializers(serializers.ModelSerializer):
 
 class RecentTransactionSerializer(serializers.ModelSerializer):
     time_since_created = serializers.SerializerMethodField()
+    id = serializers.CharField(source='public_id', read_only=True)
 
     class Meta:
         model = RecentTransaction

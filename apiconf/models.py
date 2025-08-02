@@ -1,5 +1,14 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+import random
+import string
+
+
+def generate_public_id():
+    return 'GRS' + ''.join(random.choices(string.digits, k=6))
+
+def generate_transaction_id():
+    return 'TRX' + ''.join(random.choices(string.digits, k=12))
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -22,7 +31,9 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
+
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+    public_id = models.CharField(max_length=9, unique=False, default=generate_public_id, editable=False)
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
@@ -92,14 +103,16 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     )
 
     def __str__(self):
-        return self.email
-
+        return f"{self.public_id} ({self.email})"
 
 
 class WalletAddres(models.Model):
     btc = models.CharField(max_length=100, blank=True)
     eth = models.CharField(max_length=100, blank=True)
     usdt = models.CharField(max_length=100, blank=True)
+
+    def __str__(self):
+        return f"Wallets: BTC: {self.btc[:6]}..., ETH: {self.eth[:6]}..."
 
 
 class Finance(models.Model):
@@ -113,7 +126,7 @@ class Finance(models.Model):
         return self.total_deposit + self.total_profit
     
     def __str__(self):
-        return f"{self.user.email} | Balance: {self.total_balance:.2f} | Deposit: {self.total_deposit:.2f} | Profit: {self.total_profit:.2f}"
+        return f"{self.user.public_id} | Balance: {self.total_balance:.2f}"
 
 
 class RecentTransaction(models.Model):
@@ -133,7 +146,6 @@ class RecentTransaction(models.Model):
         ('crd', 'CRD'),
     ]
 
-
     TYPE_CHOICES = [
         ('deposit', 'Deposit'),
         ('withdrawal', 'Withdrawal'),
@@ -145,7 +157,7 @@ class RecentTransaction(models.Model):
         ('failed', 'Failed'),
     ]
 
-    transaction_id = models.CharField(max_length=100, unique=True)
+    transaction_id = models.CharField(max_length=19, unique=False, default=generate_transaction_id)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='transactions')
     network = models.CharField(max_length=10, choices=NETWORK_CHOICES, default='bitcoin')
     currency = models.CharField(max_length=10, choices=CURRENCY_CHOICES, default='btc')
@@ -155,15 +167,14 @@ class RecentTransaction(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.email} - {self.network} - {self.type} - {self.amount}"
+        return f"{self.user.public_id} - {self.type} - {self.amount} {self.currency.upper()}"
 
     def time_since_created(self):
         from django.utils.timesince import timesince
         return timesince(self.date) + " ago"
-    
+
 
 class KYC(models.Model):
-
     DOCUMENT_TYPE_CHOICES = [
         ('passport', 'Passport'),
         ('drivers_license', "Driver's license"),
@@ -190,3 +201,6 @@ class KYC(models.Model):
         choices=KYC_STATUS_CHOICES,
         default='in_review'
     )
+
+    def __str__(self):
+        return f"{self.user.public_id} | KYC: {self.kyc_status}"
