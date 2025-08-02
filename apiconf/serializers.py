@@ -75,6 +75,7 @@ class CustomUserCreateSerializer(DjoserUserCreateSerializer):
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='public_id', read_only=True)
     class Meta:
         model = User
         exclude = ("is_active", "is_staff", "is_superuser", "password", "groups", "user_permissions")
