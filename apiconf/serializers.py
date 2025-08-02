@@ -78,7 +78,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         model = User
         exclude = ("is_active", "is_staff", "is_superuser", "password", "groups", "user_permissions")
 
-class WalletAddressSerializer(serializers.Serializer):
+class WalletAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = WalletAddres
         fields = ['btc', 'eth', 'usdt']
