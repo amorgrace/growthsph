@@ -33,7 +33,7 @@ class CustomUserManager(BaseUserManager):
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    public_id = models.CharField(max_length=9, unique=False, default=generate_public_id, editable=False)
+    public_id = models.CharField(max_length=9, unique=True, default=generate_public_id, editable=False)
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
@@ -157,7 +157,7 @@ class RecentTransaction(models.Model):
         ('failed', 'Failed'),
     ]
 
-    transaction_id = models.CharField(max_length=19, unique=False, default=generate_transaction_id)
+    transaction_id = models.CharField(max_length=19, unique=True, default=generate_transaction_id)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='transactions')
     network = models.CharField(max_length=10, choices=NETWORK_CHOICES, default='bitcoin')
     currency = models.CharField(max_length=10, choices=CURRENCY_CHOICES, default='btc')
