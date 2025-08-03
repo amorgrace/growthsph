@@ -1,8 +1,9 @@
 from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import WalletAddres, Finance, RecentTransaction, KYC, BankAccount
+from .models import WalletAddres, Finance, RecentTransaction, KYC, BankAccount, UserWallet
 from djoser.serializers import UserCreateSerializer as DjoserUserCreateSerializer
+
 
 
 
@@ -134,17 +135,20 @@ class ChangePasswordSerializer(serializers.Serializer):
 class BankAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = BankAccount
-        fields = ['user', 'account_name', 'bank_name', 'account_number', 'routing_number', 'wallet_address', 'network']
-        read_only_fields = ['user']
+        fields = ['account_name', 'bank_name', 'account_number', 'routing_number']
+    
+    def create(self, validated_data):
+        user = self.context['request'].user
+        validated_data.pop('user', None)
+        return BankAccount.objects.create(user=user, **validated_data)
+    
 
-    def validate(self, data):
-        bank_fields = ['account_name', 'bank_name', 'account_number', 'routing_number']
-        crypto_fields = ['wallet_address', 'network']
 
-        has_bank = any(data.get(field) for field in bank_fields)
-        has_crypto = any(data.get(field) for field in crypto_fields)
+class UserWalletSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserWallet
+        fields = ['network', 'address']
 
-        if not has_bank and not has_crypto:
-            raise serializers.ValidationError("You must provide either bank details or crypto details.")
-
-        return data
+    def create(self, validated_data):
+        user = self.context['request'].user
+        return UserWallet.objects.create(user=user, **validated_data)

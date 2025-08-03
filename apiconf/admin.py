@@ -7,8 +7,7 @@ from .models import CustomUser, WalletAddres
 from django.db import models
 from django.forms import TextInput
 from django import forms
-from .models import Finance, KYC, RecentTransaction
-from .models import BankAccount
+from .models import Finance, KYC, RecentTransaction, BankAccount, UserWallet
 from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
 class WalletAddresInline(admin.StackedInline):
@@ -129,16 +128,12 @@ class KYCAdmin(ModelAdmin):
 
 
 @admin.register(BankAccount)
-class BankAccountAdmin(UnfoldModelAdmin):
-    list_display = ('user', 'account_name', 'bank_name', 'account_number','routing_number', 'wallet_address', 'network')
-    search_fields = ('user__email', 'account_name', 'bank_name', 'account_number')
-    ordering = ('user',)
+class BankAccountAdmin(admin.ModelAdmin):
+    list_display = ['user', 'account_name', 'bank_name', 'account_number', 'routing_number']
+    raw_id_fields = ['user']
 
-    fieldsets = (
-        ('BANKS', {
-            'fields': ('account_name', 'bank_name', 'account_number', 'routing_number'),
-        }),
-        ('CRYPTO', {
-            'fields': ('wallet_address', 'network'),
-        }),
-    )
+
+@admin.register(UserWallet)
+class UserWalletAdmin(admin.ModelAdmin):
+    list_display = ['user', 'network', 'address']
+    raw_id_fields = ['user']

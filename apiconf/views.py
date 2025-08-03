@@ -1,15 +1,16 @@
 from django.shortcuts import render
 
 # Create your views here.
-from rest_framework import viewsets
+from rest_framework import viewsets, generics, permissions
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .serializers import WalletAddressSerializer, FinancesSerializers, RecentTransactionSerializer, KYCSerializer, ChangePasswordSerializer, BankAccountSerializer
-from .models import WalletAddres, Finance, RecentTransaction, KYC, BankAccount
+from .serializers import WalletAddressSerializer, FinancesSerializers, RecentTransactionSerializer, KYCSerializer, ChangePasswordSerializer, BankAccountSerializer, UserWalletSerializer
+from .models import WalletAddres, Finance, RecentTransaction, KYC, BankAccount, UserWallet
 from djoser.serializers import ActivationSerializer
 from djoser.utils import decode_uid
 from drf_yasg.utils import swagger_auto_schema
@@ -137,14 +138,53 @@ class ChangePasswordView(APIView):
         return Response({'detail': 'Password updated successfully.'}, status=status.HTTP_200_OK)
     
 
-class BankAccountViewSet(viewsets.ModelViewSet):
-    queryset = BankAccount.objects.all()
+class BankAccountView(generics.GenericAPIView):
     serializer_class = BankAccountSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
-    @swagger_auto_schema(request_body=BankAccountSerializer)
+    def get_object(self):
+        return BankAccount.objects.filter(user=self.request.user).first()
+
+    def get(self, request):
+        instance = self.get_object()
+        if not instance:
+            return Response({"detail": "No bank account found."}, status=404)
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def post(self, request):
+        if self.get_object():
+            raise ValidationError("Bank account already exists.")
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=201)
+
+    def put(self, request):
+        instance = self.get_object()
+        if not instance:
+            raise ValidationError("No bank account to update.")
+        serializer = self.get_serializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def patch(self, request):
+        instance = self.get_object()
+        if not instance:
+            raise ValidationError("No bank account to update.")
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+
+class UserWalletListCreateView(generics.ListCreateAPIView):
+    serializer_class = UserWalletSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
     def get_queryset(self):
-        return self.queryset.filter(user=self.request.user)
-    
+        return UserWallet.objects.filter(user=self.request.user)
+
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save()

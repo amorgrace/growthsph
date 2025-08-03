@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db import models
 import random
 import string
-
+from django.conf import settings
 
 def generate_public_id():
     return 'GRS' + ''.join(random.choices(string.digits, k=6))
@@ -209,16 +209,28 @@ class KYC(models.Model):
 
 
 class BankAccount(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='bankaccount')
+    account_name = models.CharField(max_length=50, blank=True, null=True)
+    bank_name = models.CharField(max_length=50, blank=True, null=True)
+    account_number = models.IntegerField(unique=True, null=True, blank=True)
+    routing_number = models.IntegerField(unique=True, null=True, blank=True)
+
+    def __str__(self):
+        return f"Bank account for {self.user.email}"
+
+
+
+
+class UserWallet(models.Model):
     NETWORK_CHOICES = [
         ('btc', 'BTC'),
         ('eth', 'ETH'),
         ('usdt', 'USDT'),
     ]
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='bankaccount')
-    account_name = models.CharField(max_length=50, blank=True, null=True,)
-    bank_name = models.CharField(max_length=50, blank=True, null=True,)
-    account_number = models.IntegerField(unique=True, null=True, blank=True)
-    routing_number = models.IntegerField(unique=True, null=True, blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='wallets')
+    network = models.CharField(max_length=10, choices=NETWORK_CHOICES)
+    address = models.CharField(max_length=255)
 
-    wallet_address = models.CharField(max_length=50, blank=True, null=True,)
-    network = models.CharField(max_length=10, choices=NETWORK_CHOICES, default='btc', blank=True)
+    def __str__(self):
+        return f"{self.user.email} - {self.network}"
+
