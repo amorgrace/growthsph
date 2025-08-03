@@ -1,14 +1,15 @@
 from django.shortcuts import render
 
 # Create your views here.
+from rest_framework import viewsets
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView, ListAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .serializers import WalletAddressSerializer, FinancesSerializers, RecentTransactionSerializer, KYCSerializer, ChangePasswordSerializer
-from .models import WalletAddres, Finance, RecentTransaction, KYC
+from .serializers import WalletAddressSerializer, FinancesSerializers, RecentTransactionSerializer, KYCSerializer, ChangePasswordSerializer, BankAccountSerializer
+from .models import WalletAddres, Finance, RecentTransaction, KYC, BankAccount
 from djoser.serializers import ActivationSerializer
 from djoser.utils import decode_uid
 from drf_yasg.utils import swagger_auto_schema
@@ -134,3 +135,16 @@ class ChangePasswordView(APIView):
         user.save()
 
         return Response({'detail': 'Password updated successfully.'}, status=status.HTTP_200_OK)
+    
+
+class BankAccountViewSet(viewsets.ModelViewSet):
+    queryset = BankAccount.objects.all()
+    serializer_class = BankAccountSerializer
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(request_body=BankAccountSerializer)
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

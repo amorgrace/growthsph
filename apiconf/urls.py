@@ -1,8 +1,12 @@
 from django.urls import path
 from .views import WalletAddressView, UserFinancesView, UserTransactionListView, KYCUploadView, ChangePasswordView
 # from .views import test_email_view 
-from apiconf.views import ActivateUserView
+from apiconf.views import ActivateUserView, BankAccountViewSet
+from rest_framework.routers import DefaultRouter
 
+
+router = DefaultRouter()
+router.register(r'user/account', BankAccountViewSet, basename='account')
 urlpatterns = [
     path('wallet/', WalletAddressView.as_view(), name='wallet-address'),
     path('user/finance/', UserFinancesView.as_view(), name='user-finance'),
@@ -12,3 +16,4 @@ urlpatterns = [
     path("activate/<uid>/<token>/", ActivateUserView.as_view(), name="user-activate"),
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
 ] 
+urlpatterns += router.urls

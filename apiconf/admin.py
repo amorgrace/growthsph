@@ -8,6 +8,8 @@ from django.db import models
 from django.forms import TextInput
 from django import forms
 from .models import Finance, KYC, RecentTransaction
+from .models import BankAccount
+from unfold.admin import ModelAdmin as UnfoldModelAdmin
 
 class WalletAddresInline(admin.StackedInline):
     model = WalletAddres
@@ -124,3 +126,19 @@ class KYCAdmin(ModelAdmin):
     list_filter = ('kyc_status', 'id_type')
     search_fields = ('user__email',)
     list_per_page = 25
+
+
+@admin.register(BankAccount)
+class BankAccountAdmin(UnfoldModelAdmin):
+    list_display = ('user', 'account_name', 'bank_name', 'account_number','routing_number', 'wallet_address', 'network')
+    search_fields = ('user__email', 'account_name', 'bank_name', 'account_number')
+    ordering = ('user',)
+
+    fieldsets = (
+        ('BANKS', {
+            'fields': ('account_name', 'bank_name', 'account_number', 'routing_number'),
+        }),
+        ('CRYPTO', {
+            'fields': ('wallet_address', 'network'),
+        }),
+    )

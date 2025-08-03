@@ -17,6 +17,8 @@ import cloudinary.uploader
 import cloudinary.api
 from decouple import config, Csv
 import dj_database_url
+from datetime import timedelta
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -111,6 +113,9 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
     'BLACKLIST_AFTER_ROTATION': True,
     'ROTATE_REFRESH_TOKENS': True,
+
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),  # Default is 5 mins
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),  
 }
 
 SWAGGER_SETTINGS = {

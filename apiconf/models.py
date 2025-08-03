@@ -150,6 +150,7 @@ class RecentTransaction(models.Model):
     TYPE_CHOICES = [
         ('deposit', 'Deposit'),
         ('withdrawal', 'Withdrawal'),
+        ('mining', 'Mining'),
     ]
 
     STATUS_CHOICES = [
@@ -205,3 +206,19 @@ class KYC(models.Model):
 
     def __str__(self):
         return f"{self.user.public_id} | KYC: {self.kyc_status}"
+
+
+class BankAccount(models.Model):
+    NETWORK_CHOICES = [
+        ('btc', 'BTC'),
+        ('eth', 'ETH'),
+        ('usdt', 'USDT'),
+    ]
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='bankaccount')
+    account_name = models.CharField(max_length=50, blank=True)
+    bank_name = models.CharField(max_length=50, blank=True)
+    account_number = models.IntegerField(unique=True, null=True, blank=True)
+    routing_number = models.IntegerField(unique=True, null=True, blank=True)
+
+    wallet_address = models.CharField(max_length=50, blank=True)
+    network = models.CharField(max_length=10, choices=NETWORK_CHOICES, default='btc', blank=True)

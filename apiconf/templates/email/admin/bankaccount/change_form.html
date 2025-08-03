@@ -1,0 +1,24 @@
+{% extends "unfold/change_form.html" %}
+
+{% block preview_content %}
+<div class="unfold-preview-content">
+    <h3>BANKS</h3>
+    <dl>
+        <dt>Account Name</dt>
+        <dd>{{ object.account_name }}</dd>
+        <dt>Bank Name</dt>
+        <dd>{{ object.bank_name }}</dd>
+        <dt>Account Number</dt>
+        <dd>{{ object.account_number }}</dd>
+        <dt>Routing Number</dt>
+        <dd>{{ object.routing_number }}</dd>
+    </dl>
+    <h3>CRYPTO</h3>
+    <dl>
+        <dt>Wallet Address</dt>
+        <dd>{{ object.wallet_address }}</dd>
+        <dt>Network</dt>
+        <dd>{{ object.network }}</dd>
+    </dl>
+</div>
+{% endblock %}
