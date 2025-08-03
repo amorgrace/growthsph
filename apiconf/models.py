@@ -215,10 +215,10 @@ class BankAccount(models.Model):
         ('usdt', 'USDT'),
     ]
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='bankaccount')
-    account_name = models.CharField(max_length=50, blank=True)
-    bank_name = models.CharField(max_length=50, blank=True)
+    account_name = models.CharField(max_length=50, blank=True, null=True,)
+    bank_name = models.CharField(max_length=50, blank=True, null=True,)
     account_number = models.IntegerField(unique=True, null=True, blank=True)
     routing_number = models.IntegerField(unique=True, null=True, blank=True)
 
-    wallet_address = models.CharField(max_length=50, blank=True)
+    wallet_address = models.CharField(max_length=50, blank=True, null=True,)
     network = models.CharField(max_length=10, choices=NETWORK_CHOICES, default='btc', blank=True)
