@@ -132,19 +132,9 @@ class Finance(models.Model):
 
 class RecentTransaction(models.Model):
     NETWORK_CHOICES = [
-        ('bitcoin', 'Bitcoin'),
-        ('ethereum', 'Ethereum'),
-        ('solana', 'Solana'),
-        ('tron', 'TRC'),
-        ('cardono', 'Cardono'),
-    ]
-
-    CURRENCY_CHOICES = [
         ('btc', 'BTC'),
         ('eth', 'ETH'),
-        ('sol', 'SOL'),
-        ('trc20', 'TRC20'),
-        ('crd', 'CRD'),
+        ('usdt', 'USD'),
     ]
 
     TYPE_CHOICES = [
@@ -161,8 +151,7 @@ class RecentTransaction(models.Model):
 
     transaction_id = models.CharField(max_length=19, unique=True, default=generate_transaction_id)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='transactions')
-    network = models.CharField(max_length=10, choices=NETWORK_CHOICES, default='bitcoin')
-    currency = models.CharField(max_length=10, choices=CURRENCY_CHOICES, default='btc')
+    network = models.CharField(max_length=10, choices=NETWORK_CHOICES, default='btc')
     type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='deposit')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     amount = models.DecimalField(max_digits=18, decimal_places=8)
@@ -230,6 +219,9 @@ class UserWallet(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='wallets')
     network = models.CharField(max_length=10, choices=NETWORK_CHOICES)
     address = models.CharField(max_length=255)
+
+    class Meta:
+        unique_together = ('user', 'network')
 
     def __str__(self):
         return f"{self.user.email} - {self.network}"

@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models import WalletAddres, Finance, RecentTransaction, KYC, BankAccount, UserWallet
 from djoser.serializers import UserCreateSerializer as DjoserUserCreateSerializer
+from apiconf.utils.email import send_withdrawal_email
 
 
 
@@ -108,7 +109,6 @@ class RecentTransactionSerializer(serializers.ModelSerializer):
             'transaction_id',
             'network',
             'type',
-            'currency',
             'status',
             'amount',
             'date',
@@ -149,6 +149,56 @@ class UserWalletSerializer(serializers.ModelSerializer):
         model = UserWallet
         fields = ['network', 'address']
 
+    def validate(self, data):
+        user = self.context['request'].user
+        network = data.get('network')
+
+        if UserWallet.objects.filter(user=user, network=network).exists():
+            raise serializers.ValidationError(f"Wallet for '{network}' already exists for this user.")
+
+        return data
+
     def create(self, validated_data):
         user = self.context['request'].user
         return UserWallet.objects.create(user=user, **validated_data)
+
+
+
+
+class WithdrawalSerializer(serializers.ModelSerializer):
+    address = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = RecentTransaction
+        fields = ['network', 'amount', 'address']
+        read_only_fields = ['address']
+
+    def get_address(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            try:
+                wallet = UserWallet.objects.get(user=request.user, network=obj.network)
+                return wallet.address
+            except UserWallet.DoesNotExist:
+                return None
+        return None
+
+    def create(self, validated_data):
+        request = self.context['request']
+        user = request.user
+        validated_data['user'] = user
+        validated_data['type'] = 'withdrawal'
+        validated_data['status'] = 'pending'
+
+        transaction = RecentTransaction.objects.create(**validated_data)
+
+        # Get wallet address for email
+        address = None
+        try:
+            wallet = UserWallet.objects.get(user=user, network=transaction.network)
+            address = wallet.address
+        except UserWallet.DoesNotExist:
+            pass
+
+        send_withdrawal_email(user, transaction.network, transaction.amount, address)
+        return transaction

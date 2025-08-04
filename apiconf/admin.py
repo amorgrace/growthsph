@@ -102,7 +102,7 @@ class FinancesAdmin(ModelAdmin):
 @admin.register(RecentTransaction)
 class RecentTransactionAdmin(ModelAdmin):
     list_display = (
-        'user_email','transaction_id', 'network', 'type', 'currency',
+        'user_email','transaction_id', 'network', 'type',
         'status', 'amount', 'date', 'time_since_created'
     )
     list_display_links = ('user_email', 'transaction_id')
@@ -132,8 +132,7 @@ class BankAccountAdmin(admin.ModelAdmin):
     list_display = ['user', 'account_name', 'bank_name', 'account_number', 'routing_number']
     raw_id_fields = ['user']
 
-
 @admin.register(UserWallet)
 class UserWalletAdmin(admin.ModelAdmin):
     list_display = ['user', 'network', 'address']
-    raw_id_fields = ['user']
+    autocomplete_fields = ['user']

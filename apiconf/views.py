@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from .serializers import WalletAddressSerializer, FinancesSerializers, RecentTransactionSerializer, KYCSerializer, ChangePasswordSerializer, BankAccountSerializer, UserWalletSerializer
+from .serializers import WalletAddressSerializer, FinancesSerializers, RecentTransactionSerializer, KYCSerializer, ChangePasswordSerializer, BankAccountSerializer, UserWalletSerializer, WithdrawalSerializer
 from .models import WalletAddres, Finance, RecentTransaction, KYC, BankAccount, UserWallet
 from djoser.serializers import ActivationSerializer
 from djoser.utils import decode_uid
@@ -188,3 +188,7 @@ class UserWalletListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save()
+
+class CreateWithdrawalView(generics.CreateAPIView):
+    serializer_class = WithdrawalSerializer
+    permission_classes = [permissions.IsAuthenticated]
