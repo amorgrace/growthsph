@@ -158,7 +158,7 @@ class RecentTransaction(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.public_id} - {self.type} - {self.amount} {self.currency.upper()}"
+        return f"{self.user.public_id} - {self.type} - {self.amount}"
 
     def time_since_created(self):
         from django.utils.timesince import timesince
