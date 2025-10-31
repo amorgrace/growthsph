@@ -79,19 +79,19 @@ MIDDLEWARE = [
 ]
 
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 DJOSER = {
     "LOGIN_FIELD": "email",
-    "SEND_ACTIVATION_EMAIL": True,
-    "ACTIVATION_URL": "activate/{uid}/{token}",
+    # "SEND_ACTIVATION_EMAIL": True,
+    # "ACTIVATION_URL": "activate/{uid}/{token}",
     "SERIALIZERS": {
         "user_create": "apiconf.serializers.CustomUserCreateSerializer",
         "user": "apiconf.serializers.CustomUserSerializer",
     },
-    "EMAIL": {
-        "activation": "apiconf.email.CustomActivationEmail",
-    },
+    # "EMAIL": {
+    #     "activation": "apiconf.email.CustomActivationEmail",
+    # },
 }
 EMAIL_BACKEND = config('EMAIL_BACKEND')
 EMAIL_HOST = config('EMAIL_HOST')

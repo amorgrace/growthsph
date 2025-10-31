@@ -200,5 +200,5 @@ class WithdrawalSerializer(serializers.ModelSerializer):
         except UserWallet.DoesNotExist:
             pass
 
-        send_withdrawal_email(user, transaction.network, transaction.amount, address)
+        # send_withdrawal_email(user, transaction.network, transaction.amount, address)
         return transaction
